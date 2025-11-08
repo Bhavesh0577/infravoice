@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: infravoice-postgres
+    environment:
+      POSTGRES_DB: infravoice
+      POSTGRES_USER: infravoice
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U infravoice"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: infravoice-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./infravoice-backend
+      dockerfile: Dockerfile
+    container_name: infravoice-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://infravoice:password@postgres:5432/infravoice
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-change-this-secret-key-in-production}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      FRONTEND_URL: http://localhost:8080
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./infravoice-backend:/app
+      - /app/__pycache__
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./infravoice-frontend
+      dockerfile: Dockerfile
+    container_name: infravoice-frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "8080:3000"
+
+volumes:
+  postgres_data:
+  redis_data:
