@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import Alert from '@/components/ui/Alert';
-import Badge from '@/components/ui/Badge';
-import Tabs from '@/components/ui/Tabs';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Badge } from '@/components/ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 interface ApiKey {
   id: string;
@@ -167,19 +167,38 @@ export default function SettingsPage() {
       </div>
 
       {/* Alerts */}
-      {success && <Alert type="success" message={success} onClose={() => setSuccess('')} />}
-      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {success && (
+        <Alert>
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
-        <div className="px-6">
-          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="px-6 border-b">
+            <TabsList className="w-full justify-start bg-transparent rounded-none h-auto p-0">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="flex items-center gap-2 border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent rounded-none pb-3 px-4"
+                >
+                  {tab.icon}
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
-        <div className="p-6">
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="space-y-6">
+          <div className="p-6">
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6 mt-0">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Profile Information</h3>
                 <div className="space-y-4">
@@ -206,18 +225,16 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <Button onClick={handleUpdateProfile} variant="primary" disabled={isLoading}>
+                    <Button onClick={handleUpdateProfile} variant="default" disabled={isLoading}>
                       {isLoading ? 'Saving...' : 'Save Changes'}
                     </Button>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Security Tab */}
-          {activeTab === 'security' && (
-            <div className="space-y-6">
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-6 mt-0">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Change Password</h3>
                 <div className="space-y-4">
@@ -255,18 +272,16 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <Button onClick={handleChangePassword} variant="primary" disabled={isLoading}>
+                    <Button onClick={handleChangePassword} variant="default" disabled={isLoading}>
                       {isLoading ? 'Updating...' : 'Update Password'}
                     </Button>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* API Keys Tab */}
-          {activeTab === 'api-keys' && (
-            <div className="space-y-6">
+            {/* API Keys Tab */}
+            <TabsContent value="api-keys" className="space-y-6 mt-0">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">API Keys</h3>
                 <p className="text-gray-600 mb-6">
@@ -314,7 +329,7 @@ export default function SettingsPage() {
                       placeholder="e.g., Production Key, Development Key"
                       className="flex-1"
                     />
-                    <Button onClick={handleCreateApiKey} variant="primary" disabled={isLoading}>
+                    <Button onClick={handleCreateApiKey} variant="default" disabled={isLoading}>
                       Create Key
                     </Button>
                   </div>
@@ -334,7 +349,7 @@ export default function SettingsPage() {
                           <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
                               <h5 className="font-semibold text-gray-900">{apiKey.name}</h5>
-                              <Badge variant="default" size="sm">Active</Badge>
+                              <Badge variant="default">Active</Badge>
                             </div>
                             <div className="text-sm text-gray-600 space-y-1">
                               <div className="flex items-center font-mono">
@@ -355,7 +370,7 @@ export default function SettingsPage() {
                               )}
                             </div>
                           </div>
-                          <Button onClick={() => handleDeleteApiKey(apiKey.id)} variant="danger" size="sm">
+                          <Button onClick={() => handleDeleteApiKey(apiKey.id)} variant="destructive" size="sm">
                             Delete
                           </Button>
                         </div>
@@ -364,12 +379,10 @@ export default function SettingsPage() {
                   )}
                 </div>
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Subscription Tab */}
-          {activeTab === 'subscription' && (
-            <div className="space-y-6">
+            {/* Subscription Tab */}
+            <TabsContent value="subscription" className="space-y-6 mt-0">
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Subscription & Usage</h3>
 
@@ -382,7 +395,7 @@ export default function SettingsPage() {
                       </h4>
                       <p className="text-teal-700">Your current subscription tier</p>
                     </div>
-                    <Button variant="primary">Upgrade Plan</Button>
+                    <Button variant="default">Upgrade Plan</Button>
                   </div>
                 </div>
 
@@ -416,13 +429,13 @@ export default function SettingsPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Account Active</span>
-                        <Badge variant={user?.is_active ? 'success' : 'danger'}>
+                        <Badge variant={user?.is_active ? 'default' : 'destructive'}>
                           {user?.is_active ? 'Yes' : 'No'}
                         </Badge>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Email Verified</span>
-                        <Badge variant={user?.is_verified ? 'success' : 'warning'}>
+                        <Badge variant={user?.is_verified ? 'default' : 'secondary'}>
                           {user?.is_verified ? 'Verified' : 'Not Verified'}
                         </Badge>
                       </div>
@@ -438,9 +451,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   );

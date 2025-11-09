@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { clsx } from 'clsx';
-import Tabs from './Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs';
 
 interface CodeFile {
   name: string;
@@ -44,12 +44,31 @@ export default function CodeEditor({ files, onFileChange, readonly = false, clas
 
   return (
     <div className={clsx('bg-white rounded-xl border-2 border-gray-200 overflow-hidden', className)}>
-      {/* File tabs */}
-      {files.length > 1 && (
-        <div className="border-b border-gray-200 bg-gray-50 px-4">
-          <Tabs tabs={tabs} activeTab={activeFile} onChange={setActiveFile} />
-        </div>
-      )}
+      <Tabs value={activeFile} onValueChange={setActiveFile} className="w-full">
+        {/* File tabs */}
+        {files.length > 1 && (
+          <div className="border-b border-gray-200 bg-gray-50 px-4">
+            <TabsList className="w-full justify-start bg-transparent rounded-none h-auto p-0">
+              {files.map((file) => (
+                <TabsTrigger
+                  key={file.name}
+                  value={file.name}
+                  className="flex items-center gap-2 border-b-2 border-transparent data-[state=active]:border-teal-600 data-[state=active]:bg-transparent rounded-none pb-2 px-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {file.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+        )}
 
       {/* Editor header */}
       <div className="bg-gray-800 px-4 py-2 flex items-center justify-between">
@@ -106,6 +125,7 @@ export default function CodeEditor({ files, onFileChange, readonly = false, clas
           </span>
         )}
       </div>
+      </Tabs>
     </div>
   );
 }

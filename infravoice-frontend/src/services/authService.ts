@@ -31,13 +31,17 @@ export interface AuthTokens {
 }
 
 const authService = {
-  async login(credentials: LoginCredentials): Promise<AuthTokens> {
+  async login(credentials: LoginCredentials, rememberMe: boolean = false): Promise<AuthTokens> {
     const response = await api.post<AuthTokens>('/api/v1/auth/login', credentials);
     const { access_token, refresh_token } = response.data;
     
-    // Store tokens
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
+    // Store tokens based on remember me preference
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem('access_token', access_token);
+    storage.setItem('refresh_token', refresh_token);
+    
+    // Also store the preference for token refresh
+    localStorage.setItem('remember_me', rememberMe.toString());
     
     return response.data;
   },
@@ -51,20 +55,27 @@ const authService = {
     try {
       await api.post('/api/v1/auth/logout');
     } finally {
+      // Clear from both storages
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('remember_me');
+      sessionStorage.removeItem('access_token');
+      sessionStorage.removeItem('refresh_token');
     }
   },
 
   async refresh(): Promise<AuthTokens> {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const rememberMe = localStorage.getItem('remember_me') === 'true';
+    const storage = rememberMe ? localStorage : sessionStorage;
+    const refreshToken = storage.getItem('refresh_token');
+    
     const response = await api.post<AuthTokens>('/api/v1/auth/refresh', {
       refresh_token: refreshToken,
     });
     
     const { access_token, refresh_token } = response.data;
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
+    storage.setItem('access_token', access_token);
+    storage.setItem('refresh_token', refresh_token);
     
     return response.data;
   },
@@ -75,7 +86,17 @@ const authService = {
   },
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('access_token');
+    return !!(localStorage.getItem('access_token') || sessionStorage.getItem('access_token'));
+  },
+
+  getAccessToken(): string | null {
+    return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+  },
+
+  getRefreshToken(): string | null {
+    const rememberMe = localStorage.getItem('remember_me') === 'true';
+    const storage = rememberMe ? localStorage : sessionStorage;
+    return storage.getItem('refresh_token');
   },
 };
 

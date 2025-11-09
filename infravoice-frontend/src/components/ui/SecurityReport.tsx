@@ -1,7 +1,7 @@
 'use client';
 
 import { SecurityScanResponse, SecurityIssue } from '@/services/securityService';
-import Badge from './Badge';
+import { Badge } from './Badge';
 import ProgressBar from './ProgressBar';
 import { clsx } from 'clsx';
 import { useState } from 'react';
@@ -15,17 +15,17 @@ export default function SecurityReport({ scanResult, className }: SecurityReport
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
 
-  const severityColors = {
-    CRITICAL: 'danger',
-    HIGH: 'warning',
-    MEDIUM: 'info',
-    LOW: 'default',
+  const severityColors: Record<string, 'destructive' | 'secondary' | 'default' | 'outline'> = {
+    critical: 'destructive',
+    high: 'secondary',
+    medium: 'secondary',
+    low: 'default',
   };
 
   const filteredIssues =
     filterSeverity === 'all'
       ? scanResult.issues
-      : scanResult.issues.filter((issue) => issue.severity === filterSeverity);
+      : scanResult.issues.filter((issue) => issue.severity.toLowerCase() === filterSeverity.toLowerCase());
 
   const getScoreVariant = (score: number): 'success' | 'warning' | 'danger' => {
     if (score >= 80) return 'success';
@@ -84,12 +84,12 @@ export default function SecurityReport({ scanResult, className }: SecurityReport
       <div className="flex items-center space-x-2">
         <span className="text-sm font-medium text-gray-700">Filter by severity:</span>
         <div className="flex gap-2">
-          {['all', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((severity) => (
+          {['all', 'critical', 'high', 'medium', 'low'].map((severity) => (
             <button
               key={severity}
               onClick={() => setFilterSeverity(severity)}
               className={clsx(
-                'px-3 py-1 rounded-lg text-sm font-medium transition-colors',
+                'px-3 py-1 rounded-lg text-sm font-medium transition-colors capitalize',
                 filterSeverity === severity
                   ? 'bg-teal-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -132,10 +132,9 @@ export default function SecurityReport({ scanResult, className }: SecurityReport
                 >
                   <div className="flex items-start space-x-3 flex-1 text-left">
                     <Badge
-                      variant={severityColors[issue.severity as keyof typeof severityColors] as any}
-                      size="sm"
+                      variant={severityColors[issue.severity.toLowerCase()] || 'default'}
                     >
-                      {issue.severity}
+                      <span className="uppercase">{issue.severity}</span>
                     </Badge>
                     <div className="flex-1">
                       <div className="font-medium text-gray-900">{issue.title}</div>

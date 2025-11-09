@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 import { clsx } from 'clsx';
 
 interface VoiceRecorderProps {
@@ -192,7 +192,7 @@ export default function VoiceRecorder({
           {/* Controls */}
           <div className="flex gap-4">
             {!isRecording ? (
-              <Button onClick={startRecording} variant="primary" size="lg">
+              <Button onClick={startRecording} variant="default" size="lg">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
@@ -203,7 +203,7 @@ export default function VoiceRecorder({
                 Start Recording
               </Button>
             ) : (
-              <Button onClick={stopRecording} variant="danger" size="lg">
+              <Button onClick={stopRecording} variant="destructive" size="lg">
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"

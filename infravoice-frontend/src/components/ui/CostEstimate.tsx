@@ -1,7 +1,7 @@
 'use client';
 
 import { CostEstimateResponse } from '@/services/costService';
-import Badge from './Badge';
+import { Badge } from './Badge';
 import { clsx } from 'clsx';
 
 interface CostEstimateProps {
@@ -82,7 +82,7 @@ export default function CostEstimate({ estimate, className }: CostEstimateProps)
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <div className="font-medium text-gray-900">{resource.name}</div>
-                  <Badge variant="default" size="sm">
+                  <Badge variant="default">
                     {resource.type}
                   </Badge>
                 </div>
@@ -114,8 +114,7 @@ export default function CostEstimate({ estimate, className }: CostEstimateProps)
                     <div className="flex items-center space-x-2 mb-2">
                       <div className="font-medium text-green-900">{rec.title}</div>
                       <Badge
-                        variant={rec.priority === 'high' ? 'warning' : 'info'}
-                        size="sm"
+                        variant={rec.priority === 'high' ? 'secondary' : 'secondary'}
                       >
                         {rec.priority}
                       </Badge>

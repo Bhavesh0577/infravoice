@@ -6,9 +6,9 @@ import Link from 'next/link';
 import deploymentService, { Deployment } from '@/services/deploymentService';
 import securityService, { SecurityScanResponse } from '@/services/securityService';
 import costService, { CostEstimateResponse } from '@/services/costService';
-import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import Tabs from '@/components/ui/Tabs';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import CodeEditor from '@/components/ui/CodeEditor';
 import SecurityReport from '@/components/ui/SecurityReport';
 import CostEstimate from '@/components/ui/CostEstimate';
@@ -65,15 +65,15 @@ export default function DeploymentDetailPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
-      deployed: 'success',
-      deploying: 'warning',
-      failed: 'danger',
-      pending: 'info',
-      destroyed: 'default',
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+      deployed: 'default',
+      deploying: 'secondary',
+      failed: 'destructive',
+      pending: 'secondary',
+      destroyed: 'outline',
     };
 
-    return <Badge variant={variants[status] || 'default'} size="lg">{status.toUpperCase()}</Badge>;
+    return <Badge variant={variants[status] || 'default'}>{status.toUpperCase()}</Badge>;
   };
 
   const tabs = [
@@ -126,7 +126,7 @@ export default function DeploymentDetailPage() {
 
         <div className="flex gap-3">
           {deployment.status === 'deployed' && (
-            <Button onClick={handleDestroy} variant="danger">
+            <Button onClick={handleDestroy} variant="destructive">
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -188,7 +188,7 @@ export default function DeploymentDetailPage() {
           <h3 className="font-bold text-gray-900 mb-4">Resources ({deployment.resources.length})</h3>
           <div className="flex flex-wrap gap-2">
             {deployment.resources.map((resource, idx) => (
-              <Badge key={idx} variant="info">
+              <Badge key={idx} variant="secondary">
                 {resource}
               </Badge>
             ))}
@@ -198,14 +198,21 @@ export default function DeploymentDetailPage() {
 
       {/* Tabs */}
       <div className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-6">
-          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="px-6 border-b">
+            <TabsList className="w-full justify-start">
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2">
+                  {tab.icon}
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
-        <div className="p-6">
-          {/* Overview Tab */}
-          {activeTab === 'overview' && (
-            <div className="space-y-6">
+          <div className="p-6">
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6 mt-0">
               <div>
                 <h3 className="font-bold text-gray-900 mb-4">Deployment Timeline</h3>
                 <div className="space-y-4">
@@ -258,19 +265,15 @@ export default function DeploymentDetailPage() {
                   )}
                 </div>
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Code Tab */}
-          {activeTab === 'code' && (
-            <div>
+            {/* Code Tab */}
+            <TabsContent value="code" className="mt-0">
               <CodeEditor files={codeFiles} readonly />
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Security Tab */}
-          {activeTab === 'security' && (
-            <div>
+            {/* Security Tab */}
+            <TabsContent value="security" className="mt-0">
               {securityScan ? (
                 <SecurityReport scanResult={securityScan} />
               ) : (
@@ -282,12 +285,10 @@ export default function DeploymentDetailPage() {
                   <p className="text-gray-600">Security scan data not found for this deployment.</p>
                 </div>
               )}
-            </div>
-          )}
+            </TabsContent>
 
-          {/* Cost Tab */}
-          {activeTab === 'cost' && (
-            <div>
+            {/* Cost Tab */}
+            <TabsContent value="cost" className="mt-0">
               {costEstimate ? (
                 <CostEstimate estimate={costEstimate} />
               ) : (
@@ -299,9 +300,9 @@ export default function DeploymentDetailPage() {
                   <p className="text-gray-600">Cost estimation data not found for this deployment.</p>
                 </div>
               )}
-            </div>
-          )}
-        </div>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   );

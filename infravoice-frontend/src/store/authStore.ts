@@ -5,7 +5,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signup: (email: string, username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -17,10 +17,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isLoading: false,
 
-  login: async (email: string, password: string) => {
+  login: async (email: string, password: string, rememberMe: boolean = false) => {
     set({ isLoading: true });
     try {
-      await authService.login({ email, password });
+      await authService.login({ email, password }, rememberMe);
       const user = await authService.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {

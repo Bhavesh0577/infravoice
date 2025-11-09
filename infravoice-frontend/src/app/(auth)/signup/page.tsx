@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -190,7 +190,7 @@ export default function SignupPage() {
         <div>
           <Button
             type="submit"
-            variant="primary"
+            variant="default"
             className="w-full"
             disabled={isLoading}
           >

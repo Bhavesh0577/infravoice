@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import deploymentService, { Deployment } from '@/services/deploymentService';
-import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import Input from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { Input } from '@/components/ui/Input';
 import { clsx } from 'clsx';
 
 export default function DeploymentsPage() {
@@ -61,12 +61,12 @@ export default function DeploymentsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'default'> = {
-      deployed: 'success',
-      deploying: 'warning',
-      failed: 'danger',
-      pending: 'info',
-      destroyed: 'default',
+    const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+      deployed: 'default',
+      deploying: 'secondary',
+      failed: 'destructive',
+      pending: 'secondary',
+      destroyed: 'outline',
     };
 
     return <Badge variant={variants[status] || 'default'}>{status.toUpperCase()}</Badge>;
@@ -113,7 +113,7 @@ export default function DeploymentsPage() {
           <p className="text-gray-600 mt-2">Manage and monitor your infrastructure deployments</p>
         </div>
         <Link href="/deploy">
-          <Button variant="primary" size="lg">
+          <Button variant="default" size="lg">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -219,7 +219,7 @@ export default function DeploymentsPage() {
               : 'Create your first deployment to get started'}
           </p>
           <Link href="/deploy">
-            <Button variant="primary">Create Deployment</Button>
+            <Button variant="default">Create Deployment</Button>
           </Link>
         </div>
       ) : (
@@ -330,7 +330,7 @@ export default function DeploymentsPage() {
                   {deployment.status === 'deployed' && (
                     <Button
                       onClick={() => handleDelete(deployment.id)}
-                      variant="danger"
+                      variant="destructive"
                       size="sm"
                     >
                       Destroy
@@ -351,3 +351,4 @@ export default function DeploymentsPage() {
     </div>
   );
 }
+

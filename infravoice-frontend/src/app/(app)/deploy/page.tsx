@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import VoiceRecorder from '@/components/ui/VoiceRecorder';
 import CodeEditor from '@/components/ui/CodeEditor';
 import SecurityReport from '@/components/ui/SecurityReport';
 import CostEstimate from '@/components/ui/CostEstimate';
-import Alert from '@/components/ui/Alert';
-import Badge from '@/components/ui/Badge';
-import Tabs from '@/components/ui/Tabs';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Badge } from '@/components/ui/Badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import voiceService from '@/services/voiceService';
 import codeService, { CodeGenerationResponse } from '@/services/codeService';
 import securityService, { SecurityScanResponse } from '@/services/securityService';
@@ -239,7 +239,11 @@ export default function DeployPage() {
       </div>
 
       {/* Error Alert */}
-      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Step: Input (Voice or Text) */}
       {currentStep === 'input' && (
@@ -278,7 +282,7 @@ export default function DeployPage() {
                 <div className="mt-6 bg-white border-2 border-gray-200 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-bold text-gray-900">Transcription</h3>
-                    <Badge variant="success">Ready</Badge>
+                    <Badge variant="default">Ready</Badge>
                   </div>
                   <p className="text-gray-700 leading-relaxed">{transcript}</p>
                 </div>
@@ -304,10 +308,12 @@ export default function DeployPage() {
             <h3 className="font-bold text-gray-900 mb-4">Deployment Configuration</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="cloud-provider" className="block text-sm font-medium text-gray-700 mb-2">
                   Cloud Provider
                 </label>
                 <select
+                  id="cloud-provider"
+                  name="cloud-provider"
                   value={cloudProvider}
                   onChange={(e) => setCloudProvider(e.target.value as any)}
                   className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-teal-600 focus:ring-2 focus:ring-teal-200 transition-colors"
@@ -319,8 +325,10 @@ export default function DeployPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-2">Region</label>
                 <Input
+                  id="region"
+                  name="region"
                   type="text"
                   value={region}
                   onChange={(e) => setRegion(e.target.value)}
@@ -335,7 +343,7 @@ export default function DeployPage() {
           <div className="flex justify-center">
             <Button
               onClick={handleGenerateCode}
-              variant="primary"
+              variant="default"
               size="lg"
               disabled={(!transcript && !textInput.trim()) || isProcessing}
             >
@@ -380,7 +388,7 @@ export default function DeployPage() {
                 <h3 className="text-xl font-bold text-gray-900">Review Generated Code</h3>
                 <p className="text-sm text-gray-500 mt-1">{generatedCode.message}</p>
               </div>
-              <Badge variant="success">Code Generated</Badge>
+              <Badge variant="default">Code Generated</Badge>
             </div>
 
             {/* Resources */}
@@ -389,7 +397,7 @@ export default function DeployPage() {
                 <h4 className="font-semibold text-gray-900 mb-3">Resources to be created:</h4>
                 <div className="flex flex-wrap gap-2">
                   {generatedCode.resources.map((resource, idx) => (
-                    <Badge key={idx} variant="info">
+                    <Badge key={idx} variant="secondary">
                       {resource}
                     </Badge>
                   ))}
@@ -407,7 +415,7 @@ export default function DeployPage() {
               Start Over
             </Button>
             <div className="flex gap-4">
-              <Button onClick={handleSecurityScan} variant="primary" size="lg">
+              <Button onClick={handleSecurityScan} variant="default" size="lg">
                 Continue to Security Scan
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -458,7 +466,7 @@ export default function DeployPage() {
                 <Button onClick={handleStartOver} variant="outline">
                   Cancel
                 </Button>
-                <Button onClick={handleDeploy} variant="primary" size="lg">
+                <Button onClick={handleDeploy} variant="default" size="lg">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -502,7 +510,7 @@ export default function DeployPage() {
             <Button onClick={handleStartOver} variant="outline" size="lg">
               Create Another Deployment
             </Button>
-            <Button onClick={() => router.push('/deployments')} variant="primary" size="lg">
+            <Button onClick={() => router.push('/deployments')} variant="default" size="lg">
               View All Deployments
             </Button>
           </div>
@@ -511,3 +519,4 @@ export default function DeployPage() {
     </div>
   );
 }
+
